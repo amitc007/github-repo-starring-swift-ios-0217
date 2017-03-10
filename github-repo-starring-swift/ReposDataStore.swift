@@ -26,6 +26,46 @@ class ReposDataStore {
             }
             completion()
         }
-    }
+        
+    } //func getRepositories
+    
+    func toggleStarStatus(for repo:GithubRepository, completion:@escaping (_ starred:Bool)->()) {
+        var isStarred = false
+        let gitClient = GithubAPIClient()
+        let myGroup = DispatchGroup()
+        
+        //myGroup.enter()    //to prevent async execution
+        gitClient.checkIfRepositoryIsStarred(repo.fullName) {
+            
+            isStarred = $0
+            print("In toggleStarStatus:isStarred:\(isStarred)")
 
+            if isStarred {
+                gitClient.unstarRepository(named: repo.fullName) {
+                    print("unstarring \(repo.fullName)")
+                    isStarred = false
+                    completion(isStarred)
+                }
+                
+            } else {
+                gitClient.starRepository(named: repo.fullName) {
+                    print("starring \(repo.fullName)")
+                    isStarred = true
+                    completion(isStarred)
+                }
+            }
+            //myGroup.leave()
+
+            
+
+        } //gitClient.checkIfRepositoryIsStarred
+        
+        
+        print("After checkIfRepositoryIsStarred")
+        
+    } //func toggleStarStatus
+
+    
+    
+    
 }
